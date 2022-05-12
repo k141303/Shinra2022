@@ -1,0 +1,10 @@
+debug_mode: false
+
+defaults:
+  - preprocess: classification
+
+data:
+  dir: data
+  output_dir: data
+  ene_name: ENE9-0-Wikipedia2019-all-20220511.json
+  old_cirrus_name: jawiki-20190121-cirrussearch-content.json.gz

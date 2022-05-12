@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  python:
+    container_name: "shinra_baseline"
+    build:
+      context: "./docker"
+      dockerfile: "Dockerfile"
+    shm_size: 100g
+    volumes:
+      - ./:/workspace
+    working_dir: /workspace
+    tty: true   
+    deploy:
+      resources:
+        reservations:
+          devices:
+           - driver: nvidia
+             capabilities: [utility, compute, video]
