@@ -19,3 +19,10 @@ def decompose_array_tensors(arrays):
         decomposed_arrays[key] = torch.cat(decomposed_arrays[key], dim=0)
 
     return decomposed_arrays
+
+
+def flatten(arrays):
+    flat_array = []
+    for array in arrays:
+        flat_array += array
+    return flat_array

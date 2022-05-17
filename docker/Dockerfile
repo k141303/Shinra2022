@@ -8,4 +8,5 @@ RUN pip3 install \
     transformers==4.13.0 \
     mlflow==1.22.0 \
     fugashi==1.1.2 \
+    janome-0.4.2 \
     ipadic==1.0.0

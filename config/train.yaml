@@ -20,6 +20,9 @@ train:
   data:
     dir: data
 
+  model:
+    dir: model/roberta_base_wiki201221_janome_vocab_32000
+
   device:
     fp16: true
     fp16_opt_level: O1

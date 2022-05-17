@@ -4,6 +4,7 @@ import glob
 
 import json
 import gzip
+from attr import attributes
 
 import tqdm
 
@@ -97,26 +98,42 @@ class DataUtils:
 
         def ml_load_annotation_data(file_path):
             data = DataUtils.JsonL.load(file_path)
+            org_data = defaultdict(lambda: {"annotation": []})
+            attributes = set()
+            for d in data:
+                if "pageid" in d:
+                    pageid = d.pop("pageid")
+                if "page_id" in d:
+                    pageid = d.pop("page_id")
+                if "ENE" in d:
+                    del d["ENE"]
+                if "title" in d:
+                    title = d.pop("title")
+
+                org_data[pageid]["pageid"] = pageid
+                org_data[pageid]["title"] = title
+                org_data[pageid]["annotation"].append(d)
+                attributes.add(d["attribute"])
+
             category = re.match(".*/(.*?)_dist.jsonl", file_path).group(1)
-            return category, data
+            return category, list(org_data.values()), sorted(attributes)
 
         @classmethod
         def load_annotation_data(cls, file_dir, plain_texts):
             file_paths = glob.glob(os.path.join(file_dir, f"annotation/*_dist.jsonl"))
 
-            all_data, attributes = {}, defaultdict(set)
+            all_data, all_attributes = {}, {}
             with Pool(multi.cpu_count()) as p, tqdm.tqdm(
                 desc="Loading annotation_data", total=len(file_paths)
             ) as t:
-                for category, data in p.imap(cls.ml_load_annotation_data, file_paths):
+                for category, data, attributes in p.imap(cls.ml_load_annotation_data, file_paths):
+                    all_attributes[category] = attributes
                     for d in data:
-                        pageid = d["pageid"] if "pageid" in d else d["page_id"]
-                        d["text"] = plain_texts[(category, pageid)]
-                        attributes[category].add(d["attribute"])
+                        d["text"] = plain_texts[(category, d["pageid"])]
                     all_data[category] = data
                     t.update()
 
-            return all_data, {k: sorted(v) for k, v in attributes.items()}
+            return all_data, all_attributes
 
         @classmethod
         def load(cls, file_dir):
