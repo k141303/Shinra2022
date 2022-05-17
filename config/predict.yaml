@@ -1,0 +1,20 @@
+hydra:
+  run:
+    dir: outputs 
+
+defaults:
+  - predict: classification
+
+predict:
+  debug_mode: false
+
+  data:
+    dir: data
+    output_dir: data
+
+  device:
+    fp16: true
+    fp16_opt_level: O1
+    no_cuda: false
+    device: null # Store during execution
+    n_gpu: null # Store during execution

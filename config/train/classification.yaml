@@ -1,0 +1,27 @@
+defaults:
+  - optim: adamw
+  - scheduler: linear_with_warmup
+
+name: classification
+
+total_updates: 10000
+gradient_accumulation_steps: 1
+
+log_updates: 10
+
+dataloader:
+  num_workers: 16
+  train:
+    batch_size: 32
+    shuffle: true
+  eval:
+    batch_size: 64
+  
+
+model:
+  bert_cls: cl-tohoku/bert-base-japanese-whole-word-masking
+  num_tokens: 512
+
+data:
+  dataset_dir: jawiki-20190121-cirrussearch-content.json.gz_cl-tohoku_bert-base-japanese-whole-word-masking
+  dev_size: 1000

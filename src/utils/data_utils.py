@@ -19,6 +19,17 @@ class DataUtils:
             with open(file_path, "r") as f:
                 return [*map(json.loads, f)]
 
+    class Json(object):
+        def load(file_path):
+            with open(file_path, "r") as f:
+                return json.load(f)
+
+        def save(file_path, data):
+            with open(file_path, "w") as f:
+                json.dump(
+                    data, f, ensure_ascii=False, indent=4, sort_keys=True, separators=(",", ": ")
+                )
+
     class CirrusSearch(object):
         def load(file_path, pageids=None, return_keys=["text"], debug_mode=False):
             data = []

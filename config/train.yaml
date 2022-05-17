@@ -1,0 +1,25 @@
+hydra:
+  run:
+    dir: outputs 
+
+defaults:
+  - train: classification
+
+train:
+  seed: 1234
+  debug_mode: false
+
+  total_updates: 1000
+  eval_updates: 100
+  use_checkpoint: true
+  checkpoint_updates: 100
+
+  data:
+    dir: data
+
+  device:
+    fp16: true
+    fp16_opt_level: O1
+    no_cuda: false
+    device: null # Store during execution
+    n_gpu: null # Store during execution

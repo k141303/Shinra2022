@@ -1,0 +1,9 @@
+name: classification
+
+data:
+  dataset_dir: jawiki-20190121-cirrussearch-content.json.gz_cl-tohoku_bert-base-japanese-whole-word-masking
+
+dataloader:
+  num_workers: 16
+  predict:
+    batch_size: 2048
