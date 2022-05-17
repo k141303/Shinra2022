@@ -1,0 +1,6 @@
+name: attribute_extraction
+num_tokens: 512
+tokenizer_cls: cl-tohoku/bert-base-japanese-whole-word-masking
+
+data:
+  annotation_dir: shinra2022_AttributeExtraction_train_20220509

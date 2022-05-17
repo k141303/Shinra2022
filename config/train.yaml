@@ -9,10 +9,13 @@ train:
   seed: 1234
   debug_mode: false
 
-  total_updates: 1000
-  eval_updates: 100
+  total_updates: 30000
+  eval_updates: 1000
   use_checkpoint: true
-  checkpoint_updates: 100
+  checkpoint_updates: 1000
+  log_updates: 10
+
+  gradient_accumulation_steps: 1
 
   data:
     dir: data
