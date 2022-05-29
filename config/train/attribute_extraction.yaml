@@ -1,0 +1,24 @@
+defaults:
+  - optim: adamw
+  - scheduler: linear_with_warmup
+
+name: attribute_extraction
+
+dataloader:
+  num_workers: 16
+  train:
+    batch_size: 32
+    shuffle: true
+  eval:
+    batch_size: 256
+  
+model:
+  num_tokens: 512
+
+optim:
+  lr: 5e-5
+
+data:
+  dataset_dir: shinra2022_AttributeExtraction_train_20220509_prep
+  dev_size: 5
+  duplicate_tokens: 64

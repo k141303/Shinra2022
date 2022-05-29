@@ -21,7 +21,8 @@ train:
     dir: data
 
   model:
-    dir: model/roberta_base_wiki201221_janome_vocab_32000
+    bert:
+      dir: models/roberta_large_wiki201221_janome_bpe_merge_10000_vocab_24000
 
   device:
     fp16: true

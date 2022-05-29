@@ -34,6 +34,17 @@ class DataUtils:
             with open(file_path, "r") as f:
                 return [*map(json.loads, f)]
 
+        @classmethod
+        def loads(file_paths):
+            data = []
+            with Pool(multi.cpu_count()) as p, tqdm.tqdm(
+                desc="Loading", total=len(file_paths)
+            ) as t:
+                for _data in p.imap(DataUtils.JsonL.load, file_paths):
+                    data += _data
+                    t.update()
+            return data
+
     class Json(object):
         def load(file_path):
             with open(file_path, "r") as f:

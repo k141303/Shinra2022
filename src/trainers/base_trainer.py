@@ -107,11 +107,17 @@ class BaseTrainer(object):
         mean_loss = torch.mean(torch.stack(list(mean_losses.values())))
         return mean_loss, mean_losses
 
-    def make_forward_inputs(self):
-        NotImplementedError()
+    def make_forward_inputs(self, batch, with_labels=True):
+        gpu_batch = {
+            "input_ids": batch["input_ids"].to(self.cfg.device.device),
+            "attention_mask": batch["attention_mask"].to(self.cfg.device.device),
+        }
+        if with_labels:
+            gpu_batch["labels"] = batch["labels"].to(self.cfg.device.device)
+        return gpu_batch
 
     def forward_and_backward_step(self, batch):
-        outputs, losses = self.model(**self.make_forward_inputs(batch))
+        outputs, losses, labels = self.model(**self.make_forward_inputs(batch))
 
         loss, losses = self.mean_loss(losses)
 
@@ -127,8 +133,7 @@ class BaseTrainer(object):
             )
 
         self.update_outputs.append({key: value.cpu() for key, value in outputs.items()})
-        self.update_labels.append({"classification": batch["labels"]})
-
+        self.update_labels.append({key: value.cpu() for key, value in labels.items()})
         self.steps += 1
 
     def update_model_parameters(self):

@@ -8,39 +8,36 @@ from collections import defaultdict
 
 import tqdm
 
-from janome.tokenizer import Tokenizer
-
 from utils.data_utils import DataUtils
 from utils.array_utils import flatten
 
+from utils.tokenization_utils import JanomeBpeTokenizer
+
 
 def mp_preprocess(inputs):
-    category, data, output_dir = inputs
+    category, data, model_dir, output_dir = inputs
 
-    tokenizer = Tokenizer(wakati=True)
+    tokenizer = JanomeBpeTokenizer(os.path.join(model_dir, "codecs.txt"))
+
     offset_error_count = defaultdict(lambda: {"all": 0, "error": 0})
     for d in data:
-        lines = d["text"].splitlines()
-        d["tokens"] = []
+        d["category"] = category
+        d["tokens"] = tokenizer.tokenize(d["text"])
+
+        ## オフセット確認用にBPRの後続記号を取り除いたトークンを用意する
+        clean_token = lambda token: token[:-2] if token[-2:] == "@@" else token
+        clean_tokens = lambda tokens: list(map(clean_token, tokens))
+        cleaned_tokens = list(map(clean_tokens, d["tokens"]))
 
         token_offsets, front_tokens = [], [0]
-        for line in lines:
-            tokens = []
-            if len(line.strip()) != 0:
-                tokens = list(tokenizer.tokenize(line))
-
-                # janomeは先頭のスペースが消えてしまうため、オフセットがずれないよう調節
-                m = re.match("^\s*", line)
-                front_spaces = [] if m is None else list(m.group(0))
-                tokens = front_spaces + tokens
-                d["tokens"].append(tokens)
-
+        for tokens in cleaned_tokens:
             token_offsets.append([0])
             for token in tokens:
                 token_offsets[-1].append(token_offsets[-1][-1] + len(token))
             front_tokens.append(front_tokens[-1] + len(tokens))
 
         d["tokens"] = flatten(d["tokens"])
+        cleaned_tokens = flatten(cleaned_tokens)
         del d["text"]
 
         # オフセットを各トークンにマップ
@@ -70,9 +67,8 @@ def mp_preprocess(inputs):
                     ann["token_offset"]["end"] = i + front_tokens[e_id]
                     break
 
-            span_tokens = d["tokens"][ann["token_offset"]["start"] : ann["token_offset"]["end"]]
-            if ann["text_offset"]["text"] != "".join(span_tokens):
-                # print(ann["text_offset"]["text"], span_tokens)
+            span_tokens = cleaned_tokens[ann["token_offset"]["start"] : ann["token_offset"]["end"]]
+            if ann["text_offset"]["text"] != "".join(span_tokens).replace("▁", " "):
                 offset_error_count[ann["attribute"]]["error"] += 1
             offset_error_count[ann["attribute"]]["all"] += 1
 
@@ -99,7 +95,10 @@ def preprocess(cfg):
 
     DataUtils.Json.save(os.path.join(output_dir, "attributes.json"), attributes)
 
-    tasks = [(categ, data, annotation_output_dir) for categ, data in annotation_data.items()]
+    tasks = [
+        (categ, data, cfg.model.dir, annotation_output_dir)
+        for categ, data in annotation_data.items()
+    ]
     with Pool(multi.cpu_count()) as p, tqdm.tqdm(desc="Preprocessing", total=len(tasks)) as t:
         for _ in p.imap_unordered(mp_preprocess, tasks):
             t.update()

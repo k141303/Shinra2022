@@ -7,3 +7,6 @@ preprocess:
   data:
     dir: data
     output_dir: data
+
+  model:
+    dir: models/roberta_large_wiki201221_janome_bpe_merge_10000_vocab_24000

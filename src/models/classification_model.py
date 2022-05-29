@@ -26,7 +26,11 @@ class ClassificationModel(nn.Module):
         if labels is not None:
             loss_fct = nn.BCEWithLogitsLoss()
             loss = loss_fct(logits.view(-1), labels.view(-1).float())
-            return {"classification": F.sigmoid(logits)}, {"classification": loss}
+            return (
+                {"classification": F.sigmoid(logits)},
+                {"classification": loss},
+                {"classification": labels},
+            )
 
         return {"classification": F.sigmoid(logits)}
 

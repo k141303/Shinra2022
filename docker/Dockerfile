@@ -9,4 +9,6 @@ RUN pip3 install \
     mlflow==1.22.0 \
     fugashi==1.1.2 \
     janome-0.4.2 \
-    ipadic==1.0.0
+    ipadic==1.0.0 \
+    Janome==0.4.1 \
+    subword-nmt==0.3.7

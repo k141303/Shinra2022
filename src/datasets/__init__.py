@@ -1,1 +1,2 @@
 from datasets.classification_dataset import ClassificationDataset
+from datasets.attribute_extraction_dataset import AttributeExtractionDataset

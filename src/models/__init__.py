@@ -1,1 +1,2 @@
 from models.classification_model import ClassificationModel
+from models.attribute_extraction_model import AttributeExtractionModel
