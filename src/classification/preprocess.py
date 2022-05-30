@@ -1,4 +1,5 @@
 import os
+import re
 
 from multiprocessing import Pool
 import multiprocessing as multi
@@ -6,27 +7,29 @@ import multiprocessing as multi
 import tqdm
 import hydra
 
-from transformers import AutoTokenizer
+from utils.tokenization_utils import JanomeBpeTokenizer
 
 from utils.ene_utils import EneData
 from utils.data_utils import DataUtils
+from utils.array_utils import flatten
 
 
 def mp_preprocess(inputs):
-    i, data, tokenizer_cls, num_tokens, output_dir = inputs
-    tokenizer = AutoTokenizer.from_pretrained(tokenizer_cls)
+    i, data, model_dir, num_tokens, output_dir = inputs
+    tokenizer = JanomeBpeTokenizer(os.path.join(model_dir, "codecs.txt"))
 
-    for d in data:
-        tokens = tokenizer.tokenize(d["text"])[: num_tokens - 2]
-        d["token_ids"] = tokenizer.convert_tokens_to_ids(tokens)
+    for d in tqdm.tqdm(data):
+        lines = re.findall("[^。]+。?", d["text"])
+        tokens = tokenizer.tokenize(lines, max_tokens=num_tokens - 2)
+        tokens = flatten(tokens)
+        d["tokens"] = tokens[: num_tokens - 2]
         del d["text"]
 
     DataUtils.JsonL.save(os.path.join(output_dir, f"{i}.json"), data)
 
 
 def preprocess(cfg):
-    tokenizer_cls = cfg.tokenizer_cls.replace("/", "_")
-    output_dir = os.path.join(cfg.data.output_dir, f"{cfg.data.old_cirrus_name}_{tokenizer_cls}")
+    output_dir = os.path.join(cfg.data.output_dir, f"{cfg.data.old_cirrus_name}_prep")
     os.makedirs(output_dir, exist_ok=True)
 
     ene_data = EneData(os.path.join(cfg.data.dir, cfg.data.ene_name))
@@ -46,12 +49,12 @@ def preprocess(cfg):
         (
             int(i / 5000),
             cirrus_data[i : i + 5000],
-            cfg.tokenizer_cls,
+            cfg.model.dir,
             cfg.num_tokens,
             cirrus_output_dir,
         )
         for i in range(0, len(cirrus_data), 5000)
     ]
     with Pool(multi.cpu_count()) as p, tqdm.tqdm(desc="Preprocessing", total=len(tasks)) as t:
-        for _ in p.imap(mp_preprocess, tasks):
+        for _ in p.imap_unordered(mp_preprocess, tasks):
             t.update()

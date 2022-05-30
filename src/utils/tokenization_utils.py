@@ -27,9 +27,11 @@ class JanomeBpeTokenizer(object):
         if os.path.exists(bpe_codes_path):
             self.bpe = BpeTokenizer(bpe_codes_path)
 
-    def tokenize(self, text):
+    def tokenize(self, text, max_tokens=None):
         sentences = []
-        for line in text.split("\n"):
+        num_tokens = 0
+        lines = text if type(text) is list else text.split("\n")
+        for line in lines:
             tokens = self.janome.tokenize(line)
 
             l_space = re.match("^(\s*)", line).group(1)
@@ -43,4 +45,8 @@ class JanomeBpeTokenizer(object):
                 tokens = " ".join(tokens).split(" ")
             tokens = list(filter(len, tokens))
             sentences.append(tokens)
+
+            num_tokens += len(tokens)
+            if max_tokens is not None and num_tokens >= max_tokens:
+                break
         return sentences

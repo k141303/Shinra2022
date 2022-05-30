@@ -1,21 +1,30 @@
+import os
+
 import torch
 from torch import nn
 from torch.nn import functional as F
 
-from transformers import AutoConfig, AutoModel
+from transformers import RobertaConfig, RobertaModel
+
 from utils.data_utils import DataUtils
 
 
 class ClassificationModel(nn.Module):
-    def __init__(self, bert_cls, label_list, num_tokens=512):
+    def __init__(self, bert_dir, label_list, num_tokens=512, load_bert=True):
         super().__init__()
 
         self.label_list = label_list
         self.num_labels = len(label_list)
         self.num_tokens = num_tokens
-        self.bert_cls = bert_cls
-        self.config = AutoConfig.from_pretrained(bert_cls)
-        self.bert = AutoModel.from_pretrained(bert_cls, config=self.config)
+
+        self.config = RobertaConfig.from_pretrained(os.path.join(bert_dir, "config.json"))
+        if load_bert:
+            self.bert = RobertaModel.from_pretrained(
+                os.path.join(bert_dir, "pytorch_model.bin"), config=self.config
+            )
+        else:
+            self.bert = RobertaModel(self.config)
+
         self.linear = nn.Linear(self.config.hidden_size, self.num_labels)
 
     def forward(self, input_ids, attention_mask=None, labels=None):

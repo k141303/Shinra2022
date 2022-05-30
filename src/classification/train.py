@@ -14,7 +14,7 @@ def train(cfg):
         debug_mode=cfg.debug_mode,
     )
     model = ClassificationModel(
-        cfg.model.bert_cls, train_dataset.ene_id_list, num_tokens=cfg.model.num_tokens
+        cfg.model.bert.dir, train_dataset.ene_id_list, num_tokens=cfg.model.num_tokens
     )
     trainer = ClassificationTrainer(cfg, model, train_dataset, dev_dataset)
 
