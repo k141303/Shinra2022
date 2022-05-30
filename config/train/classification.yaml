@@ -14,9 +14,8 @@ dataloader:
   
 
 model:
-  bert_cls: cl-tohoku/bert-base-japanese-whole-word-masking
   num_tokens: 512
 
 data:
-  dataset_dir: jawiki-20190121-cirrussearch-content.json.gz_cl-tohoku_bert-base-japanese-whole-word-masking
+  dataset_dir: jawiki-20190121-cirrussearch-content.json.gz_prep
   dev_size: 1000

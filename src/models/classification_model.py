@@ -45,7 +45,6 @@ class ClassificationModel(nn.Module):
 
     def save(self):
         config = {
-            "bert_cls": self.bert_cls,
             "label_list": self.label_list,
             "num_tokens": self.num_tokens,
         }

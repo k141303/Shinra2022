@@ -18,10 +18,10 @@ from utils.scoring_utils import classification_micro_f1
 
 
 class ClassificationDataset(Dataset):
-    def __init__(self, data, ene_id_list, model_name, num_tokens=512):
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+    def __init__(self, data, ene_id_list, vocab, num_tokens=512):
         self.num_tokens = num_tokens
         self.data = data
+        self.vocab = vocab
         self.ene_id_list = ene_id_list
         self.num_labels = len(ene_id_list)
 
@@ -31,15 +31,17 @@ class ClassificationDataset(Dataset):
     def __getitem__(self, i):
         d = self.data[i]
 
-        input_ids = [self.tokenizer.cls_token_id] + d["token_ids"] + [self.tokenizer.sep_token_id]
-        attention_mask = [1] * len(input_ids)
+        tokens = ["<s>"] + d["tokens"] + ["</s>"]
+        attention_mask = [1] * len(tokens)
 
-        input_ids = padding(input_ids, self.tokenizer.pad_token_id, self.num_tokens)
+        tokens = padding(tokens, "<pad>", self.num_tokens)
         attention_mask = padding(attention_mask, 0, self.num_tokens)
+
+        token_ids = [self.vocab.get(token, self.vocab["<unk>"]) for token in tokens]
 
         item = {
             "pageid": d["pageid"],
-            "input_ids": torch.LongTensor(input_ids),
+            "input_ids": torch.LongTensor(token_ids),
             "attention_mask": torch.LongTensor(attention_mask),
         }
 
@@ -54,7 +56,8 @@ class ClassificationDataset(Dataset):
         return classification_micro_f1(outputs, labels, prefix=prefix)
 
     @classmethod
-    def load_dataset(cls, file_dir, model_name, num_tokens=512, dev_size=1000, debug_mode=False):
+    def load_dataset(cls, file_dir, model_dir, num_tokens=512, dev_size=1000, debug_mode=False):
+        vocab = DataUtils.Json.load(os.path.join(model_dir, "vocab.json"))
         ene_id_list = DataUtils.Json.load(os.path.join(file_dir, "ene_id_list.json"))
 
         file_paths = glob.glob(os.path.join(file_dir, "data/*.json"))
@@ -77,13 +80,13 @@ class ClassificationDataset(Dataset):
         train_data = [data[i] for i in train_indexes]
         dev_data = [data[i] for i in dev_indexes]
 
-        train_dataset = cls(train_data, ene_id_list, model_name, num_tokens=num_tokens)
-        dev_dataset = cls(dev_data, ene_id_list, model_name, num_tokens=num_tokens)
+        train_dataset = cls(train_data, ene_id_list, vocab, num_tokens=num_tokens)
+        dev_dataset = cls(dev_data, ene_id_list, vocab, num_tokens=num_tokens)
 
         return train_dataset, dev_dataset
 
     @classmethod
-    def load_pred_dataset(cls, file_dir, model_name, ene_id_list, num_tokens=512, debug_mode=False):
+    def load_pred_dataset(cls, file_dir, model_dir, ene_id_list, num_tokens=512, debug_mode=False):
         file_paths = glob.glob(os.path.join(file_dir, "data/*.json"))
         file_paths.sort()
 

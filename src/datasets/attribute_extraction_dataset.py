@@ -39,15 +39,16 @@ class AttributeExtractionDataset(Dataset):
         category, pageid, inputs = self.data[i]
 
         tokens, pos_labels = map(list, zip(*inputs))
-        token_ids = [self.vocab.get(token, self.vocab["<unk>"]) for token in tokens]
+        tokens = ["<s>"] + tokens + ["</s>"]
 
-        token_ids = [self.vocab["<s>"]] + token_ids + [self.vocab["</s>"]]
         pos_labels = [[-100] * len(self.attributes[category])] + pos_labels
-        attention_mask = [1] * len(token_ids)
+        attention_mask = [1] * len(tokens)
 
-        token_ids = padding(token_ids, self.vocab["<pad>"], self.num_tokens)
+        tokens = padding(tokens, "<pad>", self.num_tokens)
         pos_labels = padding(pos_labels, [-100] * len(self.attributes[category]), self.num_tokens)
         attention_mask = padding(attention_mask, 0, self.num_tokens)
+
+        token_ids = [self.vocab.get(token, self.vocab["<unk>"]) for token in tokens]
 
         labels = torch.ones((self.num_tokens, len(self.all_attributes)), dtype=torch.long) * -100
         pos_labels = torch.LongTensor(pos_labels)
