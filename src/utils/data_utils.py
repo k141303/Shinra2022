@@ -4,7 +4,6 @@ import glob
 
 import json
 import gzip
-from attr import attributes
 
 import tqdm
 
