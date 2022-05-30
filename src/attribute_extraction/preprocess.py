@@ -1,5 +1,4 @@
 import os
-import re
 
 from multiprocessing import Pool
 import multiprocessing as multi

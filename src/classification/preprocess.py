@@ -5,7 +5,6 @@ from multiprocessing import Pool
 import multiprocessing as multi
 
 import tqdm
-import hydra
 
 from utils.tokenization_utils import JanomeBpeTokenizer
 
@@ -18,7 +17,7 @@ def mp_preprocess(inputs):
     i, data, model_dir, num_tokens, output_dir = inputs
     tokenizer = JanomeBpeTokenizer(os.path.join(model_dir, "codecs.txt"))
 
-    for d in tqdm.tqdm(data):
+    for d in data:
         lines = re.findall("[^。]+。?", d["text"])
         tokens = tokenizer.tokenize(lines, max_tokens=num_tokens - 2)
         tokens = flatten(tokens)
