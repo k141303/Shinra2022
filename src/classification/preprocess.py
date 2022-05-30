@@ -29,7 +29,8 @@ def mp_preprocess(inputs):
 
 def preprocess(cfg):
     output_dir = os.path.join(cfg.data.output_dir, f"{cfg.data.old_cirrus_name}_prep")
-    os.makedirs(output_dir, exist_ok=True)
+    cirrus_output_dir = os.path.join(output_dir, "data")
+    os.makedirs(cirrus_output_dir, exist_ok=True)
 
     ene_data = EneData(os.path.join(cfg.data.dir, cfg.data.ene_name))
     ene_data.save_ene_id_list(output_dir)
@@ -43,7 +44,6 @@ def preprocess(cfg):
     for d in cirrus_data:
         d["ENEs"] = ene_data.get_ene_ids(d["pageid"])
 
-    cirrus_output_dir = os.path.join(output_dir, "data")
     tasks = [
         (
             int(i / 5000),
