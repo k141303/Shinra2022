@@ -28,21 +28,25 @@ def mp_preprocess(inputs):
 
 
 def preprocess(cfg):
-    output_dir = os.path.join(cfg.data.output_dir, f"{cfg.data.old_cirrus_name}_prep")
+    output_dir = os.path.join(cfg.data.output_dir, f"{cfg.data.cirrus_name}_prep")
     cirrus_output_dir = os.path.join(output_dir, "data")
     os.makedirs(cirrus_output_dir, exist_ok=True)
 
-    ene_data = EneData(os.path.join(cfg.data.dir, cfg.data.ene_name))
-    ene_data.save_ene_id_list(output_dir)
+    ene_data, pageids = None, None
+    if cfg.data.ene_name is not None:
+        ene_data = EneData(os.path.join(cfg.data.dir, cfg.data.ene_name))
+        ene_data.save_ene_id_list(output_dir)
+        pageids = ene_data.get_pageids()
 
     cirrus_data = DataUtils.CirrusSearch.load(
-        os.path.join(cfg.data.dir, cfg.data.old_cirrus_name),
-        pageids=ene_data.get_pageids(),
+        os.path.join(cfg.data.dir, cfg.data.cirrus_name),
+        pageids=pageids,
         debug_mode=cfg.debug_mode,
     )
 
-    for d in cirrus_data:
-        d["ENEs"] = ene_data.get_ene_ids(d["pageid"])
+    if ene_data is not None:
+        for d in cirrus_data:
+            d["ENEs"] = ene_data.get_ene_ids(d["pageid"])
 
     tasks = [
         (

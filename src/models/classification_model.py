@@ -44,17 +44,20 @@ class ClassificationModel(nn.Module):
         return {"classification": F.sigmoid(logits)}
 
     def save(self):
-        config = {
+        model_config = {
             "label_list": self.label_list,
             "num_tokens": self.num_tokens,
         }
-        DataUtils.Json.save("config.json", config)
+        DataUtils.Json.save("model_config.json", model_config)
         torch.save(self.state_dict(), "pytorch_model.bin")
+        self.config.save_pretrained("./")
 
     @classmethod
     def load(cls):
-        config = DataUtils.Json.load("config.json")
+        model_config = DataUtils.Json.load("model_config.json")
         state_dict = torch.load("pytorch_model.bin")
-        model = cls(config["bert_cls"], config["label_list"], num_tokens=config["num_tokens"])
+        model = cls(
+            "./", model_config["label_list"], num_tokens=model_config["num_tokens"], load_bert=False
+        )
         model.load_state_dict(state_dict)
         return model

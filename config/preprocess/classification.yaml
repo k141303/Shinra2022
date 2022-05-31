@@ -4,4 +4,4 @@ tokenizer_cls: cl-tohoku/bert-base-japanese-whole-word-masking
 
 data:
   ene_name: ENE9-0-Wikipedia2019-all-20220511.json
-  old_cirrus_name: jawiki-20190121-cirrussearch-content.json.gz
+  cirrus_name: jawiki-20190121-cirrussearch-content.json.gz
