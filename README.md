@@ -46,4 +46,18 @@ python3 src/train.py \
 
 #### リーダーボード
 
+~~~bash
+.gpu_venv/bin/python3 ./src/predict.py \
+    hydra.run.dir=outputs/classification \
+    predict=classification \
+    predict.data.target_name=shinra2022_Categorization_leaderboard_20220530.jsonl
+~~~
+
 #### 本参加
+
+~~~bash
+.gpu_venv/bin/python3 ./src/predict.py \
+    hydra.run.dir=outputs/classification \
+    predict=classification \
+    predict.data.target_name=shinra2022_Categorization_test_20220511.jsonl
+~~~
