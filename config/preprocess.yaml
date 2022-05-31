@@ -1,3 +1,7 @@
+hydra:
+  run:
+    dir: preprocess
+
 defaults:
   - preprocess: classification
 
