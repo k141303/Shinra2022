@@ -13,7 +13,7 @@
 - リーダボード入力データ（JSONL）: `shinra2022_Categorization_leaderboard_20220530.jsonl`
 - 本評価の入力データ（JSONL）: `shinra2022_Categorization_test_20220511.jsonl`
 
-[GoogleDrive]()から以下をダウンロードし、解凍後`./models`直下に置いてください。  
+[GoogleDrive](https://drive.google.com/drive/folders/1e7QqjWDhbFkOyeIqJdcsK4whfBW5QWWY?usp=sharing)から以下をダウンロードし、解凍後`./models`直下に置いてください。  
 - `roberta_large_wiki201221_janome_bpe_merge_10000_vocab_24000.zip`
 
 本スクリプトはlargeモデルを使用していますが、計算コストを削減したい場合は小さいモデルであるbaseを使用できます。  
