@@ -9,8 +9,7 @@ predict:
   debug_mode: false
 
   data:
-    dir: data
-    output_dir: data
+    dir: ./data
 
   device:
     fp16: true

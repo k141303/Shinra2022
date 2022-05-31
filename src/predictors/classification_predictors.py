@@ -1,3 +1,4 @@
+import os
 import tqdm
 
 import torch
@@ -27,10 +28,29 @@ class ClassificationPredictor(BasePredictor, ClassificationTrainer):
             zip(all_pageids, all_outputs), total=len(all_pageids), desc="Converting labels"
         ):
             bin_outputs = (outputs >= 0.5).tolist()
+            pos_probs = outputs[outputs >= 0.5].tolist()
             pos_outputs = list(filter(is_pos, zip(self.dataset.ene_id_list, bin_outputs)))
             if len(pos_outputs) >= 1:
                 ene_ids, _ = zip(*pos_outputs)
             else:
                 ene_ids = [self.dataset.ene_id_list[torch.argmax(outputs).item()]]
-            data.append({"pageid": pageid, "ENEs": ene_ids})
-        DataUtils.JsonL.save("predicts.json", data)
+                pos_probs = [torch.max(outputs).item()]
+
+            formated_outputs = []
+            for ene_id, prob in zip(ene_ids, pos_probs):
+                formated_outputs.append(
+                    {
+                        "ENE": ene_id,
+                        "prob": prob,
+                    }
+                )
+            self.dataset.target_slots[pageid]["ENEs"][self.cfg.data.ene_tag] = formated_outputs
+
+        predictions = list(self.dataset.target_slots.values())
+        num_completion = sum([bool(d["ENEs"]) for d in predictions])
+        completion_rate = num_completion / len(predictions) * 100 if len(predictions) else -1
+        print(f"Target Completion Rate:{completion_rate:.2f}%")
+
+        os.makedirs("predictions", exist_ok=True)
+        output_path = os.path.join("predictions", self.cfg.data.target_name)
+        DataUtils.JsonL.save(output_path, predictions)

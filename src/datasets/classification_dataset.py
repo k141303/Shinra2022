@@ -18,12 +18,13 @@ from utils.scoring_utils import classification_micro_f1
 
 
 class ClassificationDataset(Dataset):
-    def __init__(self, data, ene_id_list, vocab, num_tokens=512):
+    def __init__(self, data, ene_id_list, vocab, num_tokens=512, target_slots=None):
         self.num_tokens = num_tokens
         self.data = data
         self.vocab = vocab
         self.ene_id_list = ene_id_list
         self.num_labels = len(ene_id_list)
+        self.target_slots = target_slots
 
     def __len__(self):
         return len(self.data)
@@ -58,6 +59,8 @@ class ClassificationDataset(Dataset):
     @classmethod
     def load_dataset(cls, file_dir, model_dir, num_tokens=512, dev_size=1000, debug_mode=False):
         vocab = DataUtils.Json.load(os.path.join(model_dir, "vocab.json"))
+        DataUtils.Json.save("vocab.json", vocab)
+
         ene_id_list = DataUtils.Json.load(os.path.join(file_dir, "ene_id_list.json"))
 
         file_paths = glob.glob(os.path.join(file_dir, "data/*.json"))
@@ -86,17 +89,30 @@ class ClassificationDataset(Dataset):
         return train_dataset, dev_dataset
 
     @classmethod
-    def load_pred_dataset(cls, file_dir, model_dir, ene_id_list, num_tokens=512, debug_mode=False):
+    def load_pred_dataset(
+        cls, file_dir, ene_id_list, target_path, num_tokens=512, debug_mode=False
+    ):
         file_paths = glob.glob(os.path.join(file_dir, "data/*.json"))
         file_paths.sort()
 
         if debug_mode:
             file_paths = file_paths[:5]
 
+        target_slots = {}
+        for d in DataUtils.JsonL.load(target_path):
+            if "page_id" in d:
+                target_slots[d["page_id"]] = d
+            else:
+                target_slots[d["pageid"]] = d
+
         data = []
         with Pool(multi.cpu_count()) as p, tqdm.tqdm(desc="Loading", total=len(file_paths)) as t:
             for _data in p.imap(DataUtils.JsonL.load, file_paths):
-                data += _data
+                for d in _data:
+                    if str(d["pageid"]) not in target_slots:
+                        continue
+                    data.append(d)
                 t.update()
 
-        return cls(data, ene_id_list, model_name, num_tokens=num_tokens)
+        vocab = DataUtils.Json.load("vocab.json")
+        return cls(data, ene_id_list, vocab, num_tokens=num_tokens, target_slots=target_slots)

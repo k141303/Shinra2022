@@ -1,9 +1,11 @@
 name: classification
 
 data:
-  dataset_dir: jawiki-20190121-cirrussearch-content.json.gz_cl-tohoku_bert-base-japanese-whole-word-masking
+  dataset_name: wikipedia-ja-20210823-json.gz_prep
+  target_name: shinra2022_Categorization_leaderboard_20220530.jsonl
+  ene_tag: AUTO.RoBERTaLarge.202206
 
 dataloader:
   num_workers: 16
   predict:
-    batch_size: 2048
+    batch_size: 256
