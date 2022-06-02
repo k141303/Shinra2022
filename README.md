@@ -4,6 +4,10 @@
 現在、分類タスクのみ実装が完了しています。  
 属性値抽出タスクにつきましては少々お待ちください。
 
+## 学習済み予測結果
+後続のタスクにご利用ください。
+- [分類タスク](https://drive.google.com/drive/folders/1ZJOt3TlSB1soSxwRmShdHKQhZkkAWrXP?usp=sharing)
+
 ## 分類タスク
 
 [ダウンロードページ](https://2022.shinra-project.info/data-download)から以下をダウンロードし、`./data`直下に置いてください。
