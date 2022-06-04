@@ -13,7 +13,7 @@
 ### 必要なデータ
 
 [ダウンロードページ](https://2022.shinra-project.info/data-download)から以下をダウンロードし、`./data`直下に置いてください。
-- 教師データ（JSONL）: `ENE9-0-Wikipedia2019-all-20220511.json`
+- 教師データ（JSONL）: `shinra2022_Categorization_train_20220511.jsonl`
 - Wikipedia2019 (CirrusSearchDump): `jawiki-20190121-cirrussearch-content.json.gz`
 - Wikipedia2021 (CirrusSearchDump) : `wikipedia-ja-20210823-json.gz` 
 - リーダボード入力データ（JSONL）: `shinra2022_Categorization_leaderboard_20220530.jsonl`
