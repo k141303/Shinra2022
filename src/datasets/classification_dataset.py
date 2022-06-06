@@ -64,6 +64,7 @@ class ClassificationDataset(Dataset):
         ene_id_list = DataUtils.Json.load(os.path.join(file_dir, "ene_id_list.json"))
 
         file_paths = glob.glob(os.path.join(file_dir, "data/*.json"))
+        assert file_paths, "glob error."
         file_paths.sort()
 
         if debug_mode:
@@ -93,6 +94,7 @@ class ClassificationDataset(Dataset):
         cls, file_dir, ene_id_list, target_path, num_tokens=512, debug_mode=False
     ):
         file_paths = glob.glob(os.path.join(file_dir, "data/*.json"))
+        assert file_paths, "glob error."
         file_paths.sort()
 
         if debug_mode:

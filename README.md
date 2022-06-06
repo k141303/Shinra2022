@@ -28,10 +28,22 @@
 
 ### 前処理
 
+#### Wikipedia2019 (学習用)
+
 ~~~bash
 python3 src/preprocess.py \
     preprocess=classification \
     preprocess.model.dir=models/roberta_large_wiki201221_janome_bpe_merge_10000_vocab_24000
+~~~
+
+#### Wikipedia2021 (予測用)
+
+~~~bash
+python3 src/preprocess.py \
+    preprocess=classification \
+    preprocess.model.dir=models/roberta_large_wiki201221_janome_bpe_merge_10000_vocab_24000 \
+    preprocess.data.ene_name=null \
+    preprocess.data.cirrus_name=wikipedia-ja-20210823-json.gz
 ~~~
 
 ### 学習

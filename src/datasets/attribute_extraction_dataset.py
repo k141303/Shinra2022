@@ -118,6 +118,7 @@ class AttributeExtractionDataset(Dataset):
         attributes = DataUtils.Json.load(os.path.join(file_dir, "attributes.json"))
 
         file_paths = glob.glob(os.path.join(file_dir, "data/*.json"))
+        assert file_paths, "glob error."
         file_paths.sort()
 
         if debug_mode:
