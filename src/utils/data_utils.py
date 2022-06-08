@@ -95,6 +95,7 @@ class DataUtils:
         @classmethod
         def load_plain_texts(cls, file_dir):
             file_paths = glob.glob(os.path.join(file_dir, f"plain/*/*.txt"))
+            assert file_paths, "glob error."
 
             data = {}
             with Pool(multi.cpu_count()) as p, tqdm.tqdm(
@@ -131,6 +132,7 @@ class DataUtils:
         @classmethod
         def load_annotation_data(cls, file_dir, plain_texts):
             file_paths = glob.glob(os.path.join(file_dir, f"annotation/*_dist.jsonl"))
+            assert file_paths, "glob error."
 
             all_data, all_attributes = {}, {}
             with Pool(multi.cpu_count()) as p, tqdm.tqdm(
